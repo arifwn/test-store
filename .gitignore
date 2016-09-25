@@ -1,0 +1,11 @@
+
+
+db.sqlite3
+*.sublime-project
+*.sublime-workspace
+*.pyc
+*.map
+.DS_Store
+src/web/assets/bundles/*.hot-update.*
+src/web/node_modules/
+webpack-stats.json

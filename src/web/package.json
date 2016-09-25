@@ -1,0 +1,47 @@
+{
+  "name": "webstore",
+  "version": "0.0.1",
+  "description": "",
+  "main": "assets/app/components/app",
+  "scripts": {
+    "watch": "webpack --config webpack.config.js --watch",
+    "build": "webpack --config webpack.config.js"
+  },
+  "author": "Arif Widi Nugroho",
+  "private": true,
+  "dependencies": {
+    "less": "^2.7.1",
+    "lodash": "^4.16.1",
+    "react": "^15.3.2",
+    "react-dom": "^15.3.2",
+    "react-redux": "^4.4.5",
+    "react-router": "^2.8.1",
+    "redux": "^3.6.0"
+  },
+  "devDependencies": {
+    "babel": "^6.5.2",
+    "babel-cli": "^6.14.0",
+    "babel-core": "^6.14.0",
+    "babel-loader": "^6.2.5",
+    "babel-preset-es2016": "^6.11.3",
+    "babel-preset-react": "^6.11.1",
+    "babel-preset-stage-0": "^6.5.0",
+    "bootstrap": "^3.3.7",
+    "bootstrap-webpack": "0.0.5",
+    "chai": "^3.5.0",
+    "css-loader": "^0.25.0",
+    "exports-loader": "^0.6.3",
+    "expose-loader": "^0.7.1",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "file-loader": "^0.9.0",
+    "imports-loader": "^0.6.5",
+    "jquery": "^3.1.1",
+    "less-loader": "^2.2.3",
+    "mocha": "^3.0.2",
+    "style-loader": "^0.13.1",
+    "uglify-js": "^2.7.3",
+    "url-loader": "^0.5.7",
+    "webpack": "^1.13.2",
+    "webpack-bundle-tracker": "0.0.93"
+  }
+}

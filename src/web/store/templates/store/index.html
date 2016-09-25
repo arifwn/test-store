@@ -1,0 +1,19 @@
+{% load render_bundle from webpack_loader %}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Store</title>
+  {% render_bundle 'store' 'css' %}
+</head>
+<body>
+  <div class="container">
+    <div id="react-app">
+      Initializing...
+    </div>
+  </div>
+
+  {% render_bundle 'store' 'js' %}
+  {% render_bundle 'app' 'js' %}
+</body>
+</html>
