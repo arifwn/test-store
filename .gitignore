@@ -8,4 +8,5 @@ db.sqlite3
 .DS_Store
 src/web/assets/bundles/*.hot-update.*
 src/web/node_modules/
+src/web/media
 webpack-stats.json
