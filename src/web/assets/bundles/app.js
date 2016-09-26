@@ -65,7 +65,7 @@
 /******/ 	}
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "47856ed16d8da7e84309"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "65553d4c435e03682db9"; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
 /******/ 	
@@ -32183,13 +32183,17 @@
 
 	'use strict';
 	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
 	var _react = __webpack_require__(4);
 	
 	var _react2 = _interopRequireDefault(_react);
 	
-	var _ProductList = __webpack_require__(80);
+	var _reactRedux = __webpack_require__(52);
 	
-	var _ProductList2 = _interopRequireDefault(_ProductList);
+	var _reactRouter = __webpack_require__(101);
 	
 	var _marked = __webpack_require__(175);
 	
@@ -32197,8 +32201,8 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	module.exports = _react2.default.createClass({
-	  displayName: 'exports',
+	var ProductItem = _react2.default.createClass({
+	  displayName: 'ProductItem',
 	
 	  getImageSrc: function getImageSrc() {
 	    if (this.props.product.image) {
@@ -32220,6 +32224,32 @@
 	  },
 	  getPrice: function getPrice() {
 	    return 'IDR ' + this.formatMoney(this.props.product.price);
+	  },
+	  addToCartBtn: function addToCartBtn() {
+	    if (this.props.product.quantity > 0) {
+	      return _react2.default.createElement(
+	        'a',
+	        { href: 'javascript:void(0)', className: 'btn btn-primary', role: 'button', onClick: this.props.onAddToCartClicked },
+	        _react2.default.createElement('span', { className: 'glyphicon glyphicon-shopping-cart', 'aria-hidden': 'true' }),
+	        ' Add to Chart'
+	      );
+	    } else {
+	      return _react2.default.createElement(
+	        'a',
+	        { href: 'javascript:void(0)', className: 'btn btn-danger', role: 'button' },
+	        'Out of Stock'
+	      );
+	    }
+	  },
+	  isInCart: function isInCart() {
+	    if (this.props.cart[this.props.product.id]) {
+	      return _react2.default.createElement(
+	        _reactRouter.Link,
+	        { to: '/cart/', className: 'btn btn-default btn-sm' },
+	        'in cart: ',
+	        this.props.cart[this.props.product.id].orderQuantity
+	      );
+	    }
 	  },
 	  render: function render() {
 	    var imgStyle = { maxWidth: '200px' };
@@ -32252,17 +32282,22 @@
 	        _react2.default.createElement(
 	          'p',
 	          null,
-	          _react2.default.createElement(
-	            'a',
-	            { href: 'javascript:void(0)', className: 'btn btn-primary', role: 'button', onClick: this.props.onAddToCartClicked },
-	            _react2.default.createElement('span', { className: 'glyphicon glyphicon-shopping-cart', 'aria-hidden': 'true' }),
-	            ' Add To Chart'
-	          )
+	          this.addToCartBtn(),
+	          '   ',
+	          this.isInCart()
 	        )
 	      )
 	    );
 	  }
 	});
+	
+	var mapStateToProps = function mapStateToProps(state) {
+	  return {
+	    cart: state.cart
+	  };
+	};
+	
+	exports.default = (0, _reactRedux.connect)(mapStateToProps)(ProductItem);
 
 /***/ },
 /* 134 */
@@ -32360,7 +32395,9 @@
 	                ),
 	                _react2.default.createElement(
 	                  _reactRouter.Link,
-	                  { to: '/', className: 'navbar-brand', href: '#' },
+	                  { to: '/', className: 'navbar-brand', onClick: function onClick() {
+	                      return _this.props.setCategoryFilter('');
+	                    } },
 	                  'Belethor\'s General Goods'
 	                )
 	              ),
@@ -32375,7 +32412,9 @@
 	                    null,
 	                    _react2.default.createElement(
 	                      _reactRouter.Link,
-	                      { to: '/', activeClassName: 'active', onlyActiveOnIndex: true },
+	                      { to: '/', activeClassName: 'active', onlyActiveOnIndex: true, onClick: function onClick() {
+	                          return _this.props.setCategoryFilter('');
+	                        } },
 	                      'Home'
 	                    )
 	                  ),
@@ -48247,7 +48286,12 @@
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'alert alert-danger', role: 'alert' },
-	        'Your cart is empty!'
+	        'Your cart is empty! ',
+	        _react2.default.createElement(
+	          _reactRouter.Link,
+	          { to: '/' },
+	          'Let\'s go shopping!'
+	        )
 	      );
 	    } else {
 	      var total = 0;
@@ -48280,6 +48324,15 @@
 	  getPrice: function getPrice(num) {
 	    return 'IDR ' + this.formatMoney(num);
 	  },
+	  checkoutBtn: function checkoutBtn() {
+	    if (_lodash2.default.size(this.props.cart) > 0) {
+	      return _react2.default.createElement(
+	        _reactRouter.Link,
+	        { to: '/checkout/', className: 'btn btn-primary' },
+	        'Checkout'
+	      );
+	    }
+	  },
 	  render: function render() {
 	    var _this = this;
 	
@@ -48305,11 +48358,7 @@
 	            }),
 	            this.hasContent(),
 	            _react2.default.createElement('hr', null),
-	            _react2.default.createElement(
-	              _reactRouter.Link,
-	              { to: '/checkout/', className: 'btn btn-primary' },
-	              'Checkout'
-	            )
+	            this.checkoutBtn()
 	          ),
 	          _react2.default.createElement(
 	            _reactRouter.Link,

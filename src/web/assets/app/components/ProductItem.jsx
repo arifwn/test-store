@@ -1,11 +1,12 @@
 'use strict';
 
 import React from 'react';
-import ProductList from '../components/ProductList';
+import { connect } from 'react-redux'
+import { Link } from 'react-router';
 
 import marked from 'marked';
 
-module.exports = React.createClass({
+var ProductItem = React.createClass({
   getImageSrc: function () {
     if (this.props.product.image) {
       return '/media/' + this.props.product.image
@@ -25,6 +26,19 @@ module.exports = React.createClass({
   getPrice: function () {
     return 'IDR ' + this.formatMoney(this.props.product.price);
   },
+  addToCartBtn: function () {
+    if (this.props.product.quantity > 0) {
+      return (<a href="javascript:void(0)" className="btn btn-primary" role="button" onClick={this.props.onAddToCartClicked}><span className="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Add to Chart</a>);
+    }
+    else {
+      return (<a href="javascript:void(0)" className="btn btn-danger" role="button">Out of Stock</a>);
+    }
+  },
+  isInCart: function () {
+    if (this.props.cart[this.props.product.id]) {
+      return (<Link to="/cart/" className="btn btn-default btn-sm">in cart: {this.props.cart[this.props.product.id].orderQuantity}</Link>);
+    }
+  },
   render: function () {
     var imgStyle = { maxWidth: '200px' };
     return (
@@ -36,10 +50,19 @@ module.exports = React.createClass({
           <h4 className="media-heading">{ this.props.product.name } ({this.getPrice()})</h4>
           <div dangerouslySetInnerHTML={ this.htmlDescription() } />
           <p>
-            <a href="javascript:void(0)" className="btn btn-primary" role="button" onClick={this.props.onAddToCartClicked}><span className="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Add To Chart</a>
+            { this.addToCartBtn() } &nbsp; { this.isInCart() }
           </p>
         </div>
       </div>
     );
   }
 })
+
+
+const mapStateToProps = state => ({
+  cart: state.cart
+})
+
+export default connect(
+  mapStateToProps
+)(ProductItem)

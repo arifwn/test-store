@@ -24,12 +24,12 @@ var App = React.createClass({
                   <span className="icon-bar"></span>
                   <span className="icon-bar"></span>
                 </button>
-                <Link to="/" className="navbar-brand" href="#">Belethor&apos;s General Goods</Link>
+                <Link to="/" className="navbar-brand" onClick={() => this.props.setCategoryFilter('')}>Belethor&apos;s General Goods</Link>
               </div>
 
               <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul className="nav navbar-nav">
-                  <li><Link to="/" activeClassName="active" onlyActiveOnIndex={true}>Home</Link></li>
+                  <li><Link to="/" activeClassName="active" onlyActiveOnIndex={true} onClick={() => this.props.setCategoryFilter('')}>Home</Link></li>
                   <li className="dropdown">
                     <a href="/category/" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Category <span className="caret"></span></a>
                     <ul className="dropdown-menu">

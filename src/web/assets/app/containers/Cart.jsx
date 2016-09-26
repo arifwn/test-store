@@ -12,7 +12,7 @@ import CartItem from '../components/CartItem';
 var Cart = React.createClass({
   hasContent: function () {
     if (_.size(this.props.cart) == 0) {
-      return (<div className="alert alert-danger" role="alert">Your cart is empty!</div>);
+      return (<div className="alert alert-danger" role="alert">Your cart is empty! <Link to="/">Let&apos;s go shopping!</Link></div>);
     }
     else {
       var total = 0;
@@ -35,6 +35,11 @@ var Cart = React.createClass({
   getPrice: function (num) {
     return 'IDR ' + this.formatMoney(num);
   },
+  checkoutBtn: function () {
+    if (_.size(this.props.cart) > 0) {
+      return (<Link to="/checkout/" className="btn btn-primary">Checkout</Link>);
+    }
+  },
   render: function () {
     return (
       <div className="Cart">
@@ -49,7 +54,7 @@ var Cart = React.createClass({
               )}
               {this.hasContent()}
               <hr />
-              <Link to="/checkout/" className="btn btn-primary">Checkout</Link>
+              { this.checkoutBtn() }
             </div>
             <Link to="/orders/">My Past Orders</Link>
           </div>
