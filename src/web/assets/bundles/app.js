@@ -65,7 +65,7 @@
 /******/ 	}
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "65553d4c435e03682db9"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "a6c23c8e3f10296faa14"; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
 /******/ 	
@@ -650,6 +650,14 @@
 	
 	var _Cart2 = _interopRequireDefault(_Cart);
 	
+	var _Orders = __webpack_require__(361);
+	
+	var _Orders2 = _interopRequireDefault(_Orders);
+	
+	var _OrderDetail = __webpack_require__(362);
+	
+	var _OrderDetail2 = _interopRequireDefault(_OrderDetail);
+	
 	var _NotFound = __webpack_require__(137);
 	
 	var _NotFound2 = _interopRequireDefault(_NotFound);
@@ -662,6 +670,7 @@
 	
 	store.dispatch((0, _actions.getAllProducts)());
 	store.dispatch((0, _actions.getAllCategories)());
+	store.dispatch((0, _actions.getAllOrders)());
 	
 	(0, _reactDom.render)(_react2.default.createElement(
 	  _reactRedux.Provider,
@@ -673,8 +682,10 @@
 	      _reactRouter.Route,
 	      { path: '/', component: _App2.default },
 	      _react2.default.createElement(_reactRouter.IndexRoute, { component: _FrontPage2.default }),
-	      _react2.default.createElement(_reactRouter.Route, { path: 'cart', component: _Cart2.default }),
-	      _react2.default.createElement(_reactRouter.Route, { path: 'about', component: _About2.default }),
+	      _react2.default.createElement(_reactRouter.Route, { path: '/cart', component: _Cart2.default }),
+	      _react2.default.createElement(_reactRouter.Route, { path: '/orders', component: _Orders2.default }),
+	      _react2.default.createElement(_reactRouter.Route, { path: '/order/:orderId/', component: _OrderDetail2.default }),
+	      _react2.default.createElement(_reactRouter.Route, { path: '/about', component: _About2.default }),
 	      _react2.default.createElement(_reactRouter.Route, { path: '*', component: _NotFound2.default })
 	    )
 	  )
@@ -26309,7 +26320,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.setCategoryFilter = exports.getAllCategories = exports.getAllProducts = exports.checkout = exports.removeFromCart = exports.addToCart = undefined;
+	exports.setCategoryFilter = exports.getAllOrders = exports.getAllCategories = exports.getAllProducts = exports.checkout = exports.removeFromCart = exports.addToCart = undefined;
 	
 	var _shop = __webpack_require__(83);
 	
@@ -26399,6 +26410,17 @@
 	  };
 	};
 	
+	var getAllOrders = exports.getAllOrders = function getAllOrders() {
+	  return function (dispatch, getState) {
+	    _shop2.default.getOrders().then(function (orders) {
+	      dispatch({
+	        type: types.UPDATE_ORDERS_LIST,
+	        orders: orders
+	      });
+	    });
+	  };
+	};
+	
 	var setCategoryFilter = exports.setCategoryFilter = function setCategoryFilter(categoryId) {
 	  return function (dispatch, getState) {
 	    dispatch({
@@ -26426,6 +26448,7 @@
 	var SET_CATEGORY_FILTER = exports.SET_CATEGORY_FILTER = 'SET_CATEGORY_FILTER';
 	var UPDATE_PRODUCTS_LIST = exports.UPDATE_PRODUCTS_LIST = 'UPDATE_PRODUCTS_LIST';
 	var UPDATE_CATEGORIES_LIST = exports.UPDATE_CATEGORIES_LIST = 'UPDATE_CATEGORIES_LIST';
+	var UPDATE_ORDERS_LIST = exports.UPDATE_ORDERS_LIST = 'UPDATE_ORDERS_LIST';
 
 /***/ },
 /* 83 */
@@ -26447,32 +26470,61 @@
 	
 	var data = {};
 	
-	var dummy = __webpack_require__(171);
+	// var dummy = require("json!../../../store/fixtures/dummy.json");
 	
-	_lodash2.default.forEach(dummy, function (item) {
-	  if (!data[item.model]) data[item.model] = {};
-	  var itemData = item.fields;
-	  itemData.id = item.pk;
-	  data[item.model][item.pk] = itemData;
-	});
+	// _.forEach(dummy, (item) => {
+	//   if (!data[item.model]) data[item.model] = {};
+	//   var itemData = item.fields;
+	//   itemData.id = item.pk;
+	//   data[item.model][item.pk] = itemData;
+	// });
 	
 	console.log(data);
 	
 	var TIMEOUT = 100;
 	
+	var getCSRFToken = function getCSRFToken() {
+	  return document.querySelector("[name=csrfmiddlewaretoken]").attributes.value.value;
+	};
+	
 	exports.default = {
 	  getProducts: function getProducts() {
 	    var promise = new Promise(function (resolve, reject) {
-	      setTimeout(function () {
-	        return resolve(data['store.product']);
-	      }, TIMEOUT);
+	      fetch('/api/v1/products/', {
+	        credentials: 'same-origin'
+	      }).then(function (response) {
+	        return response.json();
+	      }).then(function (response) {
+	        var data = {};
+	        _lodash2.default.forEach(response.results, function (item) {
+	          data[item.id] = item;
+	        });
+	        resolve(data);
+	      });
 	    });
 	    return promise;
 	  },
 	  getCategories: function getCategories() {
 	    var promise = new Promise(function (resolve, reject) {
+	      // setTimeout(() => resolve(data['store.productcategory']), TIMEOUT);
+	      fetch('/api/v1/product-categories/', {
+	        credentials: 'same-origin'
+	      }).then(function (response) {
+	        return response.json();
+	      }).then(function (response) {
+	        var data = {};
+	        _lodash2.default.forEach(response.results, function (item) {
+	          data[item.id] = item;
+	        });
+	        resolve(data);
+	      });
+	    });
+	    return promise;
+	  },
+	  getOrders: function getOrders() {
+	    var promise = new Promise(function (resolve, reject) {
 	      setTimeout(function () {
-	        return resolve(data['store.productcategory']);
+	        return resolve(data['store.order']);
 	      }, TIMEOUT);
 	    });
 	    return promise;
@@ -26585,11 +26637,24 @@
 	  }
 	}
 	
+	function orders() {
+	  var state = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	  var action = arguments[1];
+	
+	  switch (action.type) {
+	    case types.UPDATE_ORDERS_LIST:
+	      return action.orders;
+	    default:
+	      return state;
+	  }
+	}
+	
 	var app = (0, _redux.combineReducers)({
 	  categoryFilter: categoryFilter,
 	  products: products,
 	  categories: categories,
-	  cart: cart
+	  cart: cart,
+	  orders: orders
 	});
 	
 	exports.default = app;
@@ -32206,7 +32271,7 @@
 	
 	  getImageSrc: function getImageSrc() {
 	    if (this.props.product.image) {
-	      return '/media/' + this.props.product.image;
+	      return this.props.product.image;
 	    }
 	    return 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PCEtLQpTb3VyY2UgVVJMOiBob2xkZXIuanMvNjR4NjQKQ3JlYXRlZCB3aXRoIEhvbGRlci5qcyAyLjYuMC4KTGVhcm4gbW9yZSBhdCBodHRwOi8vaG9sZGVyanMuY29tCihjKSAyMDEyLTIwMTUgSXZhbiBNYWxvcGluc2t5IC0gaHR0cDovL2ltc2t5LmNvCi0tPjxkZWZzPjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+PCFbQ0RBVEFbI2hvbGRlcl8xNTc2NTk0MDAzNyB0ZXh0IHsgZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQgfSBdXT48L3N0eWxlPjwvZGVmcz48ZyBpZD0iaG9sZGVyXzE1NzY1OTQwMDM3Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIGZpbGw9IiNFRUVFRUUiLz48Zz48dGV4dCB4PSIxMy40Njg3NSIgeT0iMzYuNSI+NjR4NjQ8L3RleHQ+PC9nPjwvZz48L3N2Zz4=';
 	  },
@@ -32251,6 +32316,16 @@
 	      );
 	    }
 	  },
+	  stock: function stock() {
+	    if (this.props.product.quantity) {
+	      return _react2.default.createElement(
+	        'span',
+	        { className: 'badge' },
+	        'stock: ',
+	        this.props.product.quantity
+	      );
+	    }
+	  },
 	  render: function render() {
 	    var imgStyle = { maxWidth: '200px' };
 	    return _react2.default.createElement(
@@ -32261,7 +32336,7 @@
 	        { className: 'media-left' },
 	        _react2.default.createElement(
 	          'a',
-	          { href: '#' },
+	          { href: 'javascript:void(0)' },
 	          ' ',
 	          _react2.default.createElement('img', { className: 'media-object', src: this.getImageSrc(), style: imgStyle }),
 	          ' '
@@ -32278,6 +32353,7 @@
 	          this.getPrice(),
 	          ')'
 	        ),
+	        this.stock(),
 	        _react2.default.createElement('div', { dangerouslySetInnerHTML: this.htmlDescription() }),
 	        _react2.default.createElement(
 	          'p',
@@ -33874,748 +33950,7 @@
 /* 168 */,
 /* 169 */,
 /* 170 */,
-/* 171 */
-/***/ function(module, exports) {
-
-	module.exports = [
-		{
-			"model": "store.product",
-			"pk": 1,
-			"fields": {
-				"name": "Live Bunny",
-				"slug": "live-bunny",
-				"description": "A live, fluffy bunny shipped directly to your doorstep! This special breed of adorable bunny can survive rough shipping condition from our ~~factories~~ farm 75% of times with only moderate amount of stress. If the bunny is dead on arrival, we'll send you another one *free of charge*!\r\n\r\n**Warning! May bites when put under stress.**",
-				"image": "product_images/2016/09/bunny.jpeg",
-				"price": "150000.00",
-				"quantity": 50,
-				"weight": 1.5,
-				"virtual": false,
-				"created": "2016-09-25T12:03:36.761Z",
-				"modified": "2016-09-25T12:21:38.927Z",
-				"categories": [
-					1
-				]
-			}
-		},
-		{
-			"model": "store.product",
-			"pk": 2,
-			"fields": {
-				"name": "Green Sneakers",
-				"slug": "green-sneakers",
-				"description": "A pair of cool green sneakers. It's kinda pricey due to a lot of manual labour involved during shoe-making process.",
-				"image": "product_images/2016/09/green-sneakers.jpg",
-				"price": "500000.00",
-				"quantity": 5,
-				"weight": 1.2,
-				"virtual": false,
-				"created": "2016-09-25T16:22:50.265Z",
-				"modified": "2016-09-25T17:02:31.698Z",
-				"categories": [
-					2
-				]
-			}
-		},
-		{
-			"model": "store.product",
-			"pk": 3,
-			"fields": {
-				"name": "Selfie Sweater",
-				"slug": "selfie-sweater",
-				"description": "A really cool sweater with your own image* printed all over it.\r\n\r\n*) since this store does not allow you to upload your own picture, an admin's selfie will be used instead. No refund.",
-				"image": "product_images/2016/09/selfie-sweater.jpg",
-				"price": "150000.00",
-				"quantity": 10,
-				"weight": 1.5,
-				"virtual": false,
-				"created": "2016-09-25T17:07:07.203Z",
-				"modified": "2016-09-25T17:07:07.203Z",
-				"categories": [
-					2
-				]
-			}
-		},
-		{
-			"model": "store.product",
-			"pk": 4,
-			"fields": {
-				"name": "Teh Pucuk Harum (50% Off)",
-				"slug": "teh-pucuk-harum",
-				"description": "This nearly-expired bottle of Teh Pucuk Harum is best served ice-cold during a hot day.\r\n\r\nActually, just drink it ASAP before it expires. 50% off!",
-				"image": "product_images/2016/09/teh-pucuk-harum.jpg",
-				"price": "1500.00",
-				"quantity": 100,
-				"weight": null,
-				"virtual": false,
-				"created": "2016-09-25T17:12:43.566Z",
-				"modified": "2016-09-25T17:13:15.441Z",
-				"categories": [
-					3
-				]
-			}
-		},
-		{
-			"model": "store.product",
-			"pk": 5,
-			"fields": {
-				"name": "MLM Starter Kit",
-				"slug": "mlm-starter-kit",
-				"description": "Start building your Multi-Level Marketing empire with this MLM Starter Kit. With customisable company name and logo (just draw it yourself with a sharpie).\r\n\r\nIncludes a bonus Ponzi Scheme Pack.",
-				"image": "product_images/2016/09/stack-of-papers.jpg",
-				"price": "1200000.00",
-				"quantity": 10,
-				"weight": 5,
-				"virtual": false,
-				"created": "2016-09-25T17:18:26.840Z",
-				"modified": "2016-09-25T17:18:26.840Z",
-				"categories": [
-					4
-				]
-			}
-		},
-		{
-			"model": "store.product",
-			"pk": 6,
-			"fields": {
-				"name": "Pre-Sliced Watermelon",
-				"slug": "pre-sliced-watermelon",
-				"description": "This juicy, pre-sliced watermelon is perfect for afternoon snacking.\r\n\r\nSold per-slice.",
-				"image": "product_images/2016/09/watermelon.jpg",
-				"price": "2000.00",
-				"quantity": 20,
-				"weight": 0.2,
-				"virtual": false,
-				"created": "2016-09-25T17:24:19.169Z",
-				"modified": "2016-09-25T17:24:19.169Z",
-				"categories": [
-					3
-				]
-			}
-		},
-		{
-			"model": "store.product",
-			"pk": 7,
-			"fields": {
-				"name": "CRT TV",
-				"slug": "crt-tv",
-				"description": "Fancy playing *Duck Hunt* on your Famicom but the light gun doesn't work on your fancy 50\" LED TV? Get this old-school CRT TV right now!",
-				"image": "product_images/2016/09/crt-tv.jpg",
-				"price": "500000.00",
-				"quantity": 1,
-				"weight": 10,
-				"virtual": false,
-				"created": "2016-09-25T17:29:57.042Z",
-				"modified": "2016-09-25T17:30:07.516Z",
-				"categories": [
-					5
-				]
-			}
-		},
-		{
-			"model": "store.product",
-			"pk": 8,
-			"fields": {
-				"name": "Sony Ericsson T68i",
-				"slug": "sony-ericsson-t68i",
-				"description": "The first ~~dump~~ feature phone with a whopping 0.3 megapixel camera. Snap a super blurry pictures  and admire them on its gorgeous 101x80 pixels screen. The battery is only 700mAh, but it can go a full week without recharging (whoa, what sorcery is this)!",
-				"image": "product_images/2016/09/t68i.jpg",
-				"price": "600000.00",
-				"quantity": 1,
-				"weight": 0.8,
-				"virtual": false,
-				"created": "2016-09-25T17:39:21.354Z",
-				"modified": "2016-09-25T17:39:54.593Z",
-				"categories": [
-					5
-				]
-			}
-		},
-		{
-			"model": "store.product",
-			"pk": 9,
-			"fields": {
-				"name": "Yummy Cat Food (Canned)",
-				"slug": "yummy-cat-food-canned",
-				"description": "This yummy, mouse-flavored cat food can also double as an emergency ration. A must have!",
-				"image": "product_images/2016/09/friskies.jpg",
-				"price": "8000.00",
-				"quantity": 20,
-				"weight": 0.15,
-				"virtual": false,
-				"created": "2016-09-25T17:45:18.456Z",
-				"modified": "2016-09-25T17:53:58.277Z",
-				"categories": [
-					1,
-					3
-				]
-			}
-		},
-		{
-			"model": "store.product",
-			"pk": 10,
-			"fields": {
-				"name": "Rare Vintage 500 Bill",
-				"slug": "rare-vintage-money",
-				"description": "Indonesian paper bills always feature national heroes portraits, but not this one. This rare, vintage 500 IDR bill features a funky Orang Utan chilling on top of a branch. Only one remaining!\r\n\r\nUpdate: Too late, it's already sold out!",
-				"image": "product_images/2016/09/500-orang-utan.jpg",
-				"price": "500000.00",
-				"quantity": 0,
-				"weight": 0.1,
-				"virtual": false,
-				"created": "2016-09-25T17:50:50.712Z",
-				"modified": "2016-09-25T17:52:47.354Z",
-				"categories": [
-					4
-				]
-			}
-		},
-		{
-			"model": "store.productcategory",
-			"pk": 1,
-			"fields": {
-				"name": "Animals",
-				"slug": "animals",
-				"created": "2016-09-25T12:00:45.878Z",
-				"modified": "2016-09-25T12:00:45.878Z"
-			}
-		},
-		{
-			"model": "store.productcategory",
-			"pk": 2,
-			"fields": {
-				"name": "Apparels",
-				"slug": "apparels",
-				"created": "2016-09-25T16:22:41.053Z",
-				"modified": "2016-09-25T16:22:41.054Z"
-			}
-		},
-		{
-			"model": "store.productcategory",
-			"pk": 3,
-			"fields": {
-				"name": "Foods",
-				"slug": "foods",
-				"created": "2016-09-25T17:12:40.690Z",
-				"modified": "2016-09-25T17:12:40.690Z"
-			}
-		},
-		{
-			"model": "store.productcategory",
-			"pk": 4,
-			"fields": {
-				"name": "Misc",
-				"slug": "misc",
-				"created": "2016-09-25T17:18:24.244Z",
-				"modified": "2016-09-25T17:18:24.244Z"
-			}
-		},
-		{
-			"model": "store.productcategory",
-			"pk": 5,
-			"fields": {
-				"name": "Electronics",
-				"slug": "electronics",
-				"created": "2016-09-25T17:29:54.163Z",
-				"modified": "2016-09-25T17:29:54.163Z"
-			}
-		},
-		{
-			"model": "store.coupon",
-			"pk": 1,
-			"fields": {
-				"name": "Free for all!",
-				"code": "FREE",
-				"percentage_off": 100
-			}
-		},
-		{
-			"model": "store.coupon",
-			"pk": 2,
-			"fields": {
-				"name": "Half Price",
-				"code": "HALF",
-				"percentage_off": 50
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 1,
-			"fields": {
-				"name": "Can add log entry",
-				"content_type": 1,
-				"codename": "add_logentry"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 2,
-			"fields": {
-				"name": "Can change log entry",
-				"content_type": 1,
-				"codename": "change_logentry"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 3,
-			"fields": {
-				"name": "Can delete log entry",
-				"content_type": 1,
-				"codename": "delete_logentry"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 4,
-			"fields": {
-				"name": "Can add user",
-				"content_type": 2,
-				"codename": "add_user"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 5,
-			"fields": {
-				"name": "Can change user",
-				"content_type": 2,
-				"codename": "change_user"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 6,
-			"fields": {
-				"name": "Can delete user",
-				"content_type": 2,
-				"codename": "delete_user"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 7,
-			"fields": {
-				"name": "Can add permission",
-				"content_type": 3,
-				"codename": "add_permission"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 8,
-			"fields": {
-				"name": "Can change permission",
-				"content_type": 3,
-				"codename": "change_permission"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 9,
-			"fields": {
-				"name": "Can delete permission",
-				"content_type": 3,
-				"codename": "delete_permission"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 10,
-			"fields": {
-				"name": "Can add group",
-				"content_type": 4,
-				"codename": "add_group"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 11,
-			"fields": {
-				"name": "Can change group",
-				"content_type": 4,
-				"codename": "change_group"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 12,
-			"fields": {
-				"name": "Can delete group",
-				"content_type": 4,
-				"codename": "delete_group"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 13,
-			"fields": {
-				"name": "Can add content type",
-				"content_type": 5,
-				"codename": "add_contenttype"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 14,
-			"fields": {
-				"name": "Can change content type",
-				"content_type": 5,
-				"codename": "change_contenttype"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 15,
-			"fields": {
-				"name": "Can delete content type",
-				"content_type": 5,
-				"codename": "delete_contenttype"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 16,
-			"fields": {
-				"name": "Can add session",
-				"content_type": 6,
-				"codename": "add_session"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 17,
-			"fields": {
-				"name": "Can change session",
-				"content_type": 6,
-				"codename": "change_session"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 18,
-			"fields": {
-				"name": "Can delete session",
-				"content_type": 6,
-				"codename": "delete_session"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 19,
-			"fields": {
-				"name": "Can add order",
-				"content_type": 7,
-				"codename": "add_order"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 20,
-			"fields": {
-				"name": "Can change order",
-				"content_type": 7,
-				"codename": "change_order"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 21,
-			"fields": {
-				"name": "Can delete order",
-				"content_type": 7,
-				"codename": "delete_order"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 22,
-			"fields": {
-				"name": "Can add product category",
-				"content_type": 8,
-				"codename": "add_productcategory"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 23,
-			"fields": {
-				"name": "Can change product category",
-				"content_type": 8,
-				"codename": "change_productcategory"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 24,
-			"fields": {
-				"name": "Can delete product category",
-				"content_type": 8,
-				"codename": "delete_productcategory"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 25,
-			"fields": {
-				"name": "Can add coupon",
-				"content_type": 9,
-				"codename": "add_coupon"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 26,
-			"fields": {
-				"name": "Can change coupon",
-				"content_type": 9,
-				"codename": "change_coupon"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 27,
-			"fields": {
-				"name": "Can delete coupon",
-				"content_type": 9,
-				"codename": "delete_coupon"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 28,
-			"fields": {
-				"name": "Can add order item",
-				"content_type": 10,
-				"codename": "add_orderitem"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 29,
-			"fields": {
-				"name": "Can change order item",
-				"content_type": 10,
-				"codename": "change_orderitem"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 30,
-			"fields": {
-				"name": "Can delete order item",
-				"content_type": 10,
-				"codename": "delete_orderitem"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 31,
-			"fields": {
-				"name": "Can add address",
-				"content_type": 11,
-				"codename": "add_address"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 32,
-			"fields": {
-				"name": "Can change address",
-				"content_type": 11,
-				"codename": "change_address"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 33,
-			"fields": {
-				"name": "Can delete address",
-				"content_type": 11,
-				"codename": "delete_address"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 34,
-			"fields": {
-				"name": "Can add product",
-				"content_type": 12,
-				"codename": "add_product"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 35,
-			"fields": {
-				"name": "Can change product",
-				"content_type": 12,
-				"codename": "change_product"
-			}
-		},
-		{
-			"model": "auth.permission",
-			"pk": 36,
-			"fields": {
-				"name": "Can delete product",
-				"content_type": 12,
-				"codename": "delete_product"
-			}
-		},
-		{
-			"model": "auth.user",
-			"pk": 1,
-			"fields": {
-				"password": "pbkdf2_sha256$30000$cAgp6lQOcjct$/2sGO4Qv96TxALJx+eGqz4ectykAqFxWUtdqrnMLdiA=",
-				"last_login": "2016-09-25T11:45:05Z",
-				"is_superuser": true,
-				"username": "admin",
-				"first_name": "Super",
-				"last_name": "Admin",
-				"email": "arif+testadmin@sainsmograf.com",
-				"is_staff": true,
-				"is_active": true,
-				"date_joined": "2016-09-25T11:37:22.400Z",
-				"groups": [],
-				"user_permissions": []
-			}
-		},
-		{
-			"model": "auth.user",
-			"pk": 2,
-			"fields": {
-				"password": "pbkdf2_sha256$30000$bx7xLPn8w32a$pCtL//sVE9ZzvyFHf+YZB4hQx6A3hUPHTzVOLrvW25U=",
-				"last_login": null,
-				"is_superuser": false,
-				"username": "test",
-				"first_name": "Test",
-				"last_name": "User",
-				"email": "arif+testuser@sainsmograf.com",
-				"is_staff": false,
-				"is_active": true,
-				"date_joined": "2016-09-25T16:40:32.117Z",
-				"groups": [],
-				"user_permissions": []
-			}
-		},
-		{
-			"model": "store.address",
-			"pk": 1,
-			"fields": {
-				"user": 2,
-				"name": "Test User",
-				"address": "Jl. Ir. H.Djuanda No.390, Dago",
-				"postal_code": "40135",
-				"province": "Jawa Barat",
-				"city": "Kota Bandung",
-				"district": "Coblong",
-				"phone": "0222500303",
-				"created": "2016-09-25T16:45:15.208Z",
-				"modified": "2016-09-25T16:45:15.209Z"
-			}
-		},
-		{
-			"model": "store.order",
-			"pk": 1,
-			"fields": {
-				"checkout_date": "2016-09-25T17:55:29Z",
-				"user": 2,
-				"coupon": null,
-				"status": "PROCESSING",
-				"created": "2016-09-25T17:57:06.547Z",
-				"modified": "2016-09-25T17:57:06.547Z",
-				"payment_proof": "Hey it's me ur brother!",
-				"payment_proof_attachment": "payment_proof/2016/09/green-sneakers.jpg"
-			}
-		},
-		{
-			"model": "store.order",
-			"pk": 2,
-			"fields": {
-				"checkout_date": "2016-09-25T18:05:16Z",
-				"user": 2,
-				"coupon": 2,
-				"status": "COMPLETED",
-				"created": "2016-09-25T18:05:37.929Z",
-				"modified": "2016-09-25T18:05:37.929Z",
-				"payment_proof": "No need for proof",
-				"payment_proof_attachment": ""
-			}
-		},
-		{
-			"model": "store.orderitem",
-			"pk": 1,
-			"fields": {
-				"product": 1,
-				"user": 2,
-				"quantity": 1,
-				"order": 1,
-				"created": "2016-09-25T17:57:50.082Z",
-				"modified": "2016-09-25T17:57:50.082Z"
-			}
-		},
-		{
-			"model": "store.orderitem",
-			"pk": 2,
-			"fields": {
-				"product": 4,
-				"user": 2,
-				"quantity": 4,
-				"order": 1,
-				"created": "2016-09-25T17:58:03.187Z",
-				"modified": "2016-09-25T17:58:03.187Z"
-			}
-		},
-		{
-			"model": "store.orderitem",
-			"pk": 3,
-			"fields": {
-				"product": 6,
-				"user": 2,
-				"quantity": 1,
-				"order": 1,
-				"created": "2016-09-25T17:58:17.881Z",
-				"modified": "2016-09-25T17:58:17.881Z"
-			}
-		},
-		{
-			"model": "store.orderitem",
-			"pk": 4,
-			"fields": {
-				"product": 5,
-				"user": 2,
-				"quantity": 1,
-				"order": 2,
-				"created": "2016-09-25T18:05:58.503Z",
-				"modified": "2016-09-25T18:05:58.503Z"
-			}
-		},
-		{
-			"model": "store.orderitem",
-			"pk": 5,
-			"fields": {
-				"product": 9,
-				"user": 2,
-				"quantity": 5,
-				"order": 2,
-				"created": "2016-09-25T18:06:12.614Z",
-				"modified": "2016-09-25T18:06:12.614Z"
-			}
-		},
-		{
-			"model": "store.orderitem",
-			"pk": 6,
-			"fields": {
-				"product": 1,
-				"user": 2,
-				"quantity": 1,
-				"order": 2,
-				"created": "2016-09-25T18:06:32.874Z",
-				"modified": "2016-09-25T18:06:32.874Z"
-			}
-		}
-	];
-
-/***/ },
+/* 171 */,
 /* 172 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -48461,6 +47796,224 @@
 	    );
 	  }
 	});
+
+/***/ },
+/* 360 */,
+/* 361 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _react = __webpack_require__(4);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactRouter = __webpack_require__(101);
+	
+	var _reactRedux = __webpack_require__(52);
+	
+	var _lodash = __webpack_require__(38);
+	
+	var _lodash2 = _interopRequireDefault(_lodash);
+	
+	var _actions = __webpack_require__(81);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var Cart = _react2.default.createClass({
+	  displayName: 'Cart',
+	
+	  hasContent: function hasContent() {
+	    if (_lodash2.default.size(this.props.orders) == 0) {
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'alert alert-danger', role: 'alert' },
+	        'No past order found. ',
+	        _react2.default.createElement(
+	          _reactRouter.Link,
+	          { to: '/' },
+	          'Let\'s go shopping!'
+	        )
+	      );
+	    }
+	  },
+	  getOrderLink: function getOrderLink(order) {
+	    return "/order/" + order.id + "/";
+	  },
+	  render: function render() {
+	    var _this = this;
+	
+	    return _react2.default.createElement(
+	      'div',
+	      { className: 'Cart' },
+	      _react2.default.createElement(
+	        'div',
+	        { className: 'row' },
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'col-md-4 col-md-offset-4' },
+	          _react2.default.createElement(
+	            'ul',
+	            { className: 'list-group' },
+	            _lodash2.default.map(this.props.orders, function (order) {
+	              return _react2.default.createElement(
+	                'li',
+	                { className: 'list-group-item' },
+	                _react2.default.createElement(
+	                  _reactRouter.Link,
+	                  { to: _this.getOrderLink(order) },
+	                  'Order #',
+	                  order.id,
+	                  '; Status: ',
+	                  order.status
+	                )
+	              );
+	            }),
+	            this.hasContent()
+	          )
+	        )
+	      )
+	    );
+	  }
+	});
+	
+	var mapStateToProps = function mapStateToProps(state) {
+	  return {
+	    orders: state.orders
+	  };
+	};
+	
+	exports.default = (0, _reactRedux.connect)(mapStateToProps, { removeFromCart: _actions.removeFromCart })(Cart);
+
+/***/ },
+/* 362 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _react = __webpack_require__(4);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactRedux = __webpack_require__(52);
+	
+	var _lodash = __webpack_require__(38);
+	
+	var _lodash2 = _interopRequireDefault(_lodash);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var OrderDetail = _react2.default.createClass({
+	  displayName: 'OrderDetail',
+	
+	  getInitialState: function getInitialState() {
+	    var order = this.getOrder();
+	    return {
+	      paymentProof: order.payment_proof
+	    };
+	  },
+	  handleChange: function handleChange(event) {
+	    var order = this.getOrder();
+	    var paymentProof = event.target.value;
+	    this.setState({ paymentProof: paymentProof });
+	  },
+	  getOrder: function getOrder() {
+	    if (this.props.orders[this.props.params.orderId]) {
+	      return this.props.orders[this.props.params.orderId];
+	    }
+	    return {};
+	  },
+	  submitProof: function submitProof() {
+	    var order = this.getOrder();
+	    if (!order.id) return;
+	
+	    var paymentProof = this.state.paymentProof === undefined ? order.payment_proof : this.state.paymentProof;
+	
+	    console.log(paymentProof);
+	  },
+	  renderPaymentProof: function renderPaymentProof(order) {
+	    if (order.status == 'PENDING_PAYMENT') {
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'form-group' },
+	          _react2.default.createElement(
+	            'label',
+	            null,
+	            'Payment Proof'
+	          ),
+	          _react2.default.createElement('textarea', { className: 'form-control', value: this.state.paymentProof, defaultValue: order.payment_proof, onChange: this.handleChange })
+	        ),
+	        _react2.default.createElement(
+	          'button',
+	          { className: 'btn btn-default', onClick: this.submitProof },
+	          'Submit Payment Proof'
+	        )
+	      );
+	    } else {
+	      return _react2.default.createElement(
+	        'div',
+	        null,
+	        'Payment Proof: ',
+	        order.payment_proof
+	      );
+	    }
+	  },
+	  render: function render() {
+	    var order = this.getOrder();
+	    return _react2.default.createElement(
+	      'div',
+	      { className: 'Cart' },
+	      _react2.default.createElement(
+	        'div',
+	        { className: 'row' },
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'col-md-4 col-md-offset-4' },
+	          _react2.default.createElement(
+	            'ul',
+	            { className: 'list-group' },
+	            _react2.default.createElement(
+	              'li',
+	              { className: 'list-group-item' },
+	              'Order ID: #',
+	              this.props.params.orderId
+	            ),
+	            _react2.default.createElement(
+	              'li',
+	              { className: 'list-group-item' },
+	              'Status: ',
+	              order.status
+	            ),
+	            _react2.default.createElement(
+	              'li',
+	              { className: 'list-group-item' },
+	              this.renderPaymentProof(order)
+	            )
+	          )
+	        )
+	      )
+	    );
+	  }
+	});
+	
+	var mapStateToProps = function mapStateToProps(state) {
+	  return {
+	    orders: state.orders
+	  };
+	};
+	
+	exports.default = (0, _reactRedux.connect)(mapStateToProps)(OrderDetail);
 
 /***/ }
 /******/ ])));

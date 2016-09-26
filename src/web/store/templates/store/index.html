@@ -15,6 +15,7 @@
       Initializing...
     </div>
   </div>
+  {% csrf_token %}
 
   {% render_bundle 'store' 'js' %}
   {% render_bundle 'app' 'js' %}

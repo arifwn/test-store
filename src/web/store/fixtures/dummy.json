@@ -43,14 +43,14 @@
   "fields": {
     "name": "Selfie Sweater",
     "slug": "selfie-sweater",
-    "description": "A really cool sweater with your own image* printed all over it.\r\n\r\n*) since this store does not allow you to upload your own picture, an admin's selfie will be used instead. No refund.",
+    "description": "A really cool sweater with your own image* printed all over it.\r\n\r\n*) this store does not allow you to upload your own picture, therefore an admin's selfie will be used instead. No refund.",
     "image": "product_images/2016/09/selfie-sweater.jpg",
     "price": "150000.00",
     "quantity": 10,
     "weight": 1.5,
     "virtual": false,
     "created": "2016-09-25T17:07:07.203Z",
-    "modified": "2016-09-25T17:07:07.203Z",
+    "modified": "2016-09-26T12:26:03.048Z",
     "categories": [
       2
     ]
@@ -138,14 +138,14 @@
   "fields": {
     "name": "Sony Ericsson T68i",
     "slug": "sony-ericsson-t68i",
-    "description": "The first ~~dump~~ feature phone with a whopping 0.3 megapixel camera. Snap a super blurry pictures  and admire them on its gorgeous 101x80 pixels screen. The battery is only 700mAh, but it can go a full week without recharging (whoa, what sorcery is this)!",
+    "description": "The first ~~dump~~ feature phone with a whopping 0.3 megapixel camera. Snap a super blurry pictures  and admire them on its gorgeous 101x80 pixels screen. The tiny 700 mAh battery can go a full week without recharging (whoa, what sorcery is this!).",
     "image": "product_images/2016/09/t68i.jpg",
     "price": "600000.00",
     "quantity": 1,
     "weight": 0.8,
     "virtual": false,
     "created": "2016-09-25T17:39:21.354Z",
-    "modified": "2016-09-25T17:39:54.593Z",
+    "modified": "2016-09-26T12:32:35.712Z",
     "categories": [
       5
     ]
@@ -175,7 +175,7 @@
   "model": "store.product",
   "pk": 10,
   "fields": {
-    "name": "Rare Vintage 500 Bill",
+    "name": "Rare Vintage 500 IDR Bill",
     "slug": "rare-vintage-money",
     "description": "Indonesian paper bills always feature national heroes portraits, but not this one. This rare, vintage 500 IDR bill features a funky Orang Utan chilling on top of a branch. Only one remaining!\r\n\r\nUpdate: Too late, it's already sold out!",
     "image": "product_images/2016/09/500-orang-utan.jpg",
@@ -184,7 +184,7 @@
     "weight": 0.1,
     "virtual": false,
     "created": "2016-09-25T17:50:50.712Z",
-    "modified": "2016-09-25T17:52:47.354Z",
+    "modified": "2016-09-26T10:54:50.538Z",
     "categories": [
       4
     ]
@@ -605,7 +605,7 @@
   "pk": 2,
   "fields": {
     "password": "pbkdf2_sha256$30000$bx7xLPn8w32a$pCtL//sVE9ZzvyFHf+YZB4hQx6A3hUPHTzVOLrvW25U=",
-    "last_login": null,
+    "last_login": "2016-09-26T05:54:57.327Z",
     "is_superuser": false,
     "username": "test",
     "first_name": "Test",

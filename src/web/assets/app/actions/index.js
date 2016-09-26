@@ -58,6 +58,17 @@ export const getAllCategories = () => (dispatch, getState) => {
 }
 
 
+export const getAllOrders = () => (dispatch, getState) => {
+  shop.getOrders()
+    .then(orders => {
+      dispatch({
+        type: types.UPDATE_ORDERS_LIST,
+        orders: orders
+      })
+    });
+}
+
+
 export const setCategoryFilter = categoryId => (dispatch, getState) => {
   dispatch({
     type: types.SET_CATEGORY_FILTER,

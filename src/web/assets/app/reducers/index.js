@@ -57,11 +57,21 @@ function cart(state = {}, action) {
   }
 }
 
+function orders(state = {}, action) {
+  switch (action.type) {
+    case types.UPDATE_ORDERS_LIST:
+      return action.orders
+    default:
+      return state
+  }
+}
+
 const app = combineReducers({
   categoryFilter,
   products,
   categories,
-  cart
+  cart,
+  orders
 });
 
 export default app;
