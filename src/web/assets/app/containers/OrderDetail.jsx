@@ -3,6 +3,8 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import _ from 'lodash';
+import { submitProof } from '../actions';
+import { datastore } from '../datastore';
 
 var OrderDetail = React.createClass({
   getInitialState: function() {
@@ -28,7 +30,7 @@ var OrderDetail = React.createClass({
 
     var paymentProof = this.state.paymentProof === undefined ? order.payment_proof : this.state.paymentProof;
 
-    console.log(paymentProof);
+    datastore.dispatch(submitProof(order, paymentProof));
   },
   renderPaymentProof: function (order) {
     if (order.status == 'PENDING_PAYMENT') {

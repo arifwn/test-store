@@ -13,7 +13,9 @@ from .serializers import UserSerializer, GroupSerializer, ProductSerializer, Pro
 @login_required
 def index(request):
     template = loader.get_template('store/index.html')
-    context = {}
+    context = {
+        'user': request.user
+    }
     return HttpResponse(template.render(context, request))
 
 

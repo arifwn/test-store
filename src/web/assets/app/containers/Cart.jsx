@@ -5,7 +5,8 @@ import { Link } from 'react-router';
 import { connect } from 'react-redux'
 import _ from 'lodash';
 
-import { removeFromCart } from '../actions';
+import { removeFromCart, checkout } from '../actions';
+import { datastore } from '../datastore';
 
 import CartItem from '../components/CartItem';
 
@@ -35,9 +36,12 @@ var Cart = React.createClass({
   getPrice: function (num) {
     return 'IDR ' + this.formatMoney(num);
   },
+  checkout: function () {
+    datastore.dispatch(checkout());
+  },
   checkoutBtn: function () {
     if (_.size(this.props.cart) > 0) {
-      return (<Link to="/checkout/" className="btn btn-primary">Checkout</Link>);
+      return (<button className="btn btn-primary" onClick={this.checkout}>Checkout</button>);
     }
   },
   render: function () {

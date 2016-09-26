@@ -4,13 +4,11 @@ import React from 'react';
 import { render } from 'react-dom'
 import { Router, Route, IndexRoute, Link, browserHistory } from 'react-router'
 
-import { createStore, applyMiddleware } from 'redux';
-import reducer from './reducers';
-import thunk from 'redux-thunk';
-import createLogger from 'redux-logger';
+
+
 import { Provider } from 'react-redux'
 
-import { getAllProducts, getAllCategories, getAllOrders } from './actions';
+import { getAllProducts, getAllCategories, getAllOrders, getCurrentUser } from './actions';
 
 import App from './containers/App';
 import FrontPage from './containers/FrontPage';
@@ -20,19 +18,15 @@ import Orders from './containers/Orders';
 import OrderDetail from './containers/OrderDetail';
 import NotFound from './containers/NotFound';
 
-const middleware = [ thunk, createLogger() ];
+import { datastore } from './datastore';
 
-const store = createStore(
-  reducer,
-  applyMiddleware(...middleware)
-)
-
-store.dispatch(getAllProducts());
-store.dispatch(getAllCategories());
-store.dispatch(getAllOrders());
+datastore.dispatch(getAllProducts());
+datastore.dispatch(getAllCategories());
+datastore.dispatch(getAllOrders());
+datastore.dispatch(getCurrentUser());
 
 render((
-  <Provider store={store}>
+  <Provider store={datastore}>
     <Router history={browserHistory}>
       <Route path="/" component={App}>
         <IndexRoute component={FrontPage} />

@@ -21,20 +21,38 @@ export const removeFromCart = product => (dispatch, getState) => {
   })
 }
 
-export const checkout = products => (dispatch, getState) => {
-  const { cart } = getState()
+export const checkout = () => (dispatch, getState) => {
+  const { user, cart, coupon } = getState()
 
-  dispatch({
-    type: types.CHECKOUT_REQUEST
-  })
-  shop.buyProducts(products, () => {
-    dispatch({
-      type: types.CHECKOUT_SUCCESS,
-      cart
+  shop.createOrder(user.id, coupon, cart)
+    .then((order) => {
+      dispatch({
+        type: types.CHECKOUT_SUCCESS,
+        order: order
+      })
+      dispatch({
+        type: types.EMPTY_CART,
+      })
+
+      setTimeout(() => {
+        alert('Checkout completed. Press OK to proceed to payment confirmation.')
+        window.location = '/order/' + order.id + '/'
+      }, 0);
+      // Replace the line above with line below to rollback on failure:
+      // dispatch({ type: types.CHECKOUT_FAILURE, cart })
     })
-    // Replace the line above with line below to rollback on failure:
-    // dispatch({ type: types.CHECKOUT_FAILURE, cart })
-  })
+}
+
+export const submitProof = (order, proof) => (dispatch, getState) => {
+  const { user, cart, coupon } = getState()
+
+  shop.submitProof(order, proof)
+    .then((order) => {
+      setTimeout(() => {
+        alert('Your payment proof has been submitted. We will process the order as soon as we confirm the order validity.')
+        window.location.reload()
+      }, 0);
+    })
 }
 
 export const getAllProducts = () => (dispatch, getState) => {
@@ -64,6 +82,28 @@ export const getAllOrders = () => (dispatch, getState) => {
       dispatch({
         type: types.UPDATE_ORDERS_LIST,
         orders: orders
+      })
+    });
+}
+
+
+export const getCurrentUser = () => (dispatch, getState) => {
+  shop.getCurrentUser()
+    .then(user => {
+      dispatch({
+        type: types.UPDATE_CURRENT_USER,
+        user: user
+      })
+    });
+}
+
+
+export const getCoupon = code  => (dispatch, getState) => {
+  shop.getCoupon(code)
+    .then(coupon => {
+      dispatch({
+        type: types.UPDATE_COUPON,
+        coupon: coupon
       })
     });
 }

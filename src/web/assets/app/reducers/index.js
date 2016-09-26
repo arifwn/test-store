@@ -52,6 +52,8 @@ function cart(state = {}, action) {
         delete currentCart[product.id];
       }
       return currentCart;
+    case types.EMPTY_CART:
+      return {};
     default:
       return state
   }
@@ -61,6 +63,30 @@ function orders(state = {}, action) {
   switch (action.type) {
     case types.UPDATE_ORDERS_LIST:
       return action.orders
+    case types.CHECKOUT_SUCCESS:
+      var currentOrders = _.cloneDeep(state);
+      var order = action.order;
+
+      currentOrders[order.id] = order;
+      return currentOrders;
+    default:
+      return state
+  }
+}
+
+function user(state = {}, action) {
+  switch (action.type) {
+    case types.UPDATE_CURRENT_USER:
+      return action.user
+    default:
+      return state
+  }
+}
+
+function coupon(state = {}, action) {
+  switch (action.type) {
+    case types.UPDATE_COUPON:
+      return action.coupon
     default:
       return state
   }
@@ -71,7 +97,9 @@ const app = combineReducers({
   products,
   categories,
   cart,
-  orders
+  orders,
+  user,
+  coupon
 });
 
 export default app;

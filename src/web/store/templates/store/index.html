@@ -16,6 +16,9 @@
     </div>
   </div>
   {% csrf_token %}
+  <script type="text/javascript">
+    USER_ID = '{{ user.id }}';
+  </script>
 
   {% render_bundle 'store' 'js' %}
   {% render_bundle 'app' 'js' %}
