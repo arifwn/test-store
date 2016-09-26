@@ -65,7 +65,7 @@
 /******/ 	}
 /******/ 	
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "a6c23c8e3f10296faa14"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "112d01179862608217d0"; // eslint-disable-line no-unused-vars
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
 /******/ 	
@@ -26523,9 +26523,18 @@
 	  },
 	  getOrders: function getOrders() {
 	    var promise = new Promise(function (resolve, reject) {
-	      setTimeout(function () {
-	        return resolve(data['store.order']);
-	      }, TIMEOUT);
+	      // setTimeout(() => resolve(data['store.order']), TIMEOUT);
+	      fetch('/api/v1/orders/', {
+	        credentials: 'same-origin'
+	      }).then(function (response) {
+	        return response.json();
+	      }).then(function (response) {
+	        var data = {};
+	        _lodash2.default.forEach(response.results, function (item) {
+	          data[item.id] = item;
+	        });
+	        resolve(data);
+	      });
 	    });
 	    return promise;
 	  },

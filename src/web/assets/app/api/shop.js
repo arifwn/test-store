@@ -61,7 +61,20 @@ export default {
   },
   getOrders: () => {
     var promise = new Promise((resolve, reject) => {
-      setTimeout(() => resolve(data['store.order']), TIMEOUT);
+      // setTimeout(() => resolve(data['store.order']), TIMEOUT);
+      fetch('/api/v1/orders/', {
+        credentials: 'same-origin'
+      })
+        .then(response => {
+          return response.json();
+        })
+        .then(response => {
+          var data = {};
+          _.forEach(response.results, item => {
+            data[item.id] = item;
+          })
+          resolve(data);
+        })
     });
     return promise;
   },
