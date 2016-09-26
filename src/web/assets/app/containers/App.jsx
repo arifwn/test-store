@@ -35,10 +35,10 @@ var App = React.createClass({
                     <ul className="dropdown-menu">
                     <li><a href="javascript:void(0)" onClick={() => this.props.setCategoryFilter('')} >All Items</a></li>
                       {_.map(this.props.categories, category =>
-                        <li><a href="javascript:void(0)"
+                        <li><Link to="/"
                           key={category.id}
                           category={category}
-                          onClick={() => this.props.setCategoryFilter(category.id)} >{category.name}</a></li>
+                          onClick={() => this.props.setCategoryFilter(category.id)} >{category.name}</Link></li>
                       )}
                     </ul>
                   </li>
