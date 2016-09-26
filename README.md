@@ -2,6 +2,8 @@
 Test Ecommerce Store
 ====================
 
+Demo URL: http://belethor.sainsmograf.com/
+
 Test Credentials:
 - super user: `admin:insecure`
 - normal user: `test:insecure`
